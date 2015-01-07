@@ -31,6 +31,8 @@ Copyright (c) 2013-2014 Chukong Technologies Inc.
 
 NS_CC_BEGIN
 
+const std::string LuaEventNodeComponent::LUA_NODE_MANAGER_COMPONENT_NAME = "f4f7ef1b-cb00-49e0-bfa2-0a08b6e4ceaf";
+
 LuaEventNode *LuaEventNode::create(Node *node)
 {
     LuaEventNode *lnode = new LuaEventNode(node);

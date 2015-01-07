@@ -26,6 +26,7 @@ Copyright (c) 2013-2014 Chukong Technologies Inc.
 #define __LUA_EVENT_NODE_H_
 
 #include "2d/CCNode.h"
+#include"2d/CCComponent.h"
 
 NS_CC_BEGIN
 
@@ -117,6 +118,32 @@ private:
     virtual int executeScriptTouchHandler(int nEventType, Touch *pTouch, int phase = 1);
     virtual int executeScriptTouchHandler(int nEventType, const std::vector<Touch*>& touches, int phase = 1);
     
+};
+
+/*
+* LuaEventNodeComponent, wrap a LuaEventNode as a component for auto remove when node destroied
+*/
+
+class LuaEventNodeComponent : Component {
+	LuaEventNode*_e;
+public:
+	//an unique component name, guid string
+	static const std::string LUA_NODE_MANAGER_COMPONENT_NAME;
+
+	LuaEventNodeComponent(LuaEventNode*e):
+		_e(e)
+	{
+		_e->retain();
+		setName(LUA_NODE_MANAGER_COMPONENT_NAME);
+	}
+
+	LuaEventNode* getLuaEventNode(){
+		return _e;
+	}
+
+	virtual ~LuaEventNodeComponent(){
+		_e->release();
+	}
 };
 
 NS_CC_END

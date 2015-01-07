@@ -75,33 +75,33 @@ bool LuaNodeManager::init()
 LuaEventNode* LuaNodeManager::getLuaNodeByNode(Node *node, bool toCreate)
 {
     LuaEventNode *lnode = nullptr;
-    for (auto it = _luaNodes.begin(); it != _luaNodes.end(); ++it)
-    {
-        auto lt = (LuaEventNode *)*it;
-        if (lt->getActiveNode() == node)  //A detached node maybe use same mem address
-        {
-            lnode = lt;
-            break;
+	if (node->getComponent(LuaEventNodeComponent::LUA_NODE_MANAGER_COMPONENT_NAME) != NULL) {
+		lnode = ((LuaEventNodeComponent*)node->getComponent(LuaEventNodeComponent::LUA_NODE_MANAGER_COMPONENT_NAME))->getLuaEventNode();
+		if (lnode && lnode->getActiveNode() == node) {
+			return lnode;
+		}
+		else {
+			node->removeComponent(LuaEventNodeComponent::LUA_NODE_MANAGER_COMPONENT_NAME);
         }
     }
     if (!lnode && toCreate)
     {
         lnode = LuaEventNode::create(node);
-        if (lnode)
-        {
-            _luaNodes.pushBack(lnode);
-        }
+		Component* c = (Component*)new LuaEventNodeComponent(lnode);
+		c->init();
+		node->addComponent(c);
+		c->autorelease();
     }
     return lnode;
 }
 
 void LuaNodeManager::removeLuaNode(LuaEventNode *lnode)
 {
-    _luaNodes.eraseObject(lnode);
-    if (_luaNodes.size() < 1)
-    {
-        destroyInstance();
-    }
+	//removeComponent may deconstruct lnode, so call it before removeComponent
+	Node *detach = lnode->getDetachedNode();
+	Node *active = lnode->getActiveNode();
+	if (detach) detach->removeComponent(LuaEventNodeComponent::LUA_NODE_MANAGER_COMPONENT_NAME);
+	if (active) active->removeComponent(LuaEventNodeComponent::LUA_NODE_MANAGER_COMPONENT_NAME);
 }
 
 NS_CC_END
